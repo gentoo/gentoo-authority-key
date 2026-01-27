@@ -29,7 +29,7 @@ die() {
 refresh_keys() {
 	# we trust qa-scripts to refresh them for us
 	wget -q -O - https://qa-reports.gentoo.org/output/active-devs.gpg |
-		gpg -q --import
+		gpg -q --batch --import
 	pipestatus || die "Failed to refresh keys, exited w/ $?"
 }
 
@@ -106,7 +106,7 @@ get_signed_keys() {
 					printf "%s\t%s\n" "${email,,}" "${fpr}"
 				;;
 		esac
-	done < <(gpg --with-colons --list-keys)
+	done < <(gpg --batch --with-colons --list-keys)
 	pipestatus || die "gpg query for signed keys failed, exited w/ $?"
 }
 
@@ -176,7 +176,7 @@ sign_key() {
 				[[ ${trust} == [er] ]] && need_full=1
 				;;
 		esac
-	done < <(gpg --no-auto-check-trustdb --with-colons --list-keys "${key}" 2>/dev/null)
+	done < <(gpg --batch --no-auto-check-trustdb --with-colons --list-keys "${key}" 2>/dev/null)
 
 	if [[ ${#uids[@]} -eq 0 ]]; then
 		#echo "${sign_uid}: no @g.o UID (${key})"
@@ -190,7 +190,8 @@ sign_key() {
 
 	echo "${sign_uid}: signing new key ${key}"
 	for uid in "${uids[@]}"; do
-		gpg --no-auto-check-trustdb \
+		gpg --batch \
+			--no-auto-check-trustdb \
 			--cert-policy-url https://www.gentoo.org/glep/glep-0079.html \
 			--default-cert-expire 1y \
 			--force-sign-key \
@@ -235,13 +236,13 @@ main() {
 		fi
 	done < <(comm -13 signed.txt ldap.txt)
 
-	gpg -q --check-trustdb
+	gpg -q --batch --check-trustdb
 
 	if [[ ! ${AUTOSIGN_NO_SEND_KEYS} ]]; then
 		# send key updates to the keyserver
 		local retries=0
 		while [[ -s to-send.txt ]]; do
-			if gpg --send-keys $(head -n 10 to-send.txt); then
+			if gpg --batch --send-keys $(head -n 10 to-send.txt); then
 				tail -n +11 to-send.txt > to-send.txt.tmp &&
 				mv to-send.txt.tmp to-send.txt || die 'failure writing to-send.txt'
 			else
