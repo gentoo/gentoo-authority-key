@@ -223,6 +223,8 @@ main() {
 
 	local k uid
 	# revoke signatures on old keys
+	# TODO: add a configurable sanity check threshold for max
+	# revocations in a single run
 	while read uid k; do
 		if revoke_sig "${k}" "${uid}"; then
 			echo "${k}" >> to-send.txt || die 'failure writing to-send.txt'
