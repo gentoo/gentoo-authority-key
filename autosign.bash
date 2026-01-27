@@ -236,7 +236,8 @@ main() {
 		fi
 	done < <(comm -13 signed.txt ldap.txt)
 
-	gpg -q --batch --check-trustdb
+	# XXX: --batch here makes gpg print 'next trustdb check due at ...'
+	gpg -q --check-trustdb
 
 	if [[ ! ${AUTOSIGN_NO_SEND_KEYS} ]]; then
 		# send key updates to the keyserver
