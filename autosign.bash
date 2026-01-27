@@ -30,7 +30,7 @@ refresh_keys() {
 	# we trust qa-scripts to refresh them for us
 	wget -q -O - https://qa-reports.gentoo.org/output/active-devs.gpg |
 		gpg -q --import
-	pipestatus || die "Failed to refresh keys: $?"
+	pipestatus || die "Failed to refresh keys, exited w/ $?"
 }
 
 # Get UID-fingerprint mapping from LDAP, for active devs.
@@ -67,7 +67,7 @@ get_ldap() {
 				;;
 		esac
 	done < <(ldapsearch -Z -D '' -LLL "${AUTOSIGN_FILTER:-(gentooStatus=active)}" gpgfingerprint)
-	pipestatus || die "LDAP query failed: $?"
+	pipestatus || die "LDAP query failed, exited w/ $?"
 }
 
 # Get UID-fingerprint list of all currently trusted keys.
@@ -107,7 +107,7 @@ get_signed_keys() {
 				;;
 		esac
 	done < <(gpg --with-colons --list-keys)
-	pipestatus || die "gpg query for signed keys failed: $?"
+	pipestatus || die "gpg query for signed keys failed, exited w/ $?"
 }
 
 # Revoke the specified UID signature.
@@ -208,9 +208,9 @@ main() {
 
 	refresh_keys
 	get_ldap | sort -u > ldap.txt
-	pipestatus || die "failure writing ldap.txt: $?"
+	pipestatus || die "failure writing ldap.txt, exited w/ $?"
 	get_signed_keys | sort -u > signed.txt
-	pipestatus || die "failure writing signed.txt: $?"
+	pipestatus || die "failure writing signed.txt, exited w/ $?"
 
 	if ! [[ -s ldap.txt ]] ; then
 		# Avoid revoking every key we trust if our LDAP query fails
