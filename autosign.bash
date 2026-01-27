@@ -160,7 +160,7 @@ sign_key() {
 	done < <(gpg --no-auto-check-trustdb --with-colons --list-keys "${key}" 2>/dev/null)
 
 	if [[ ${#uids[@]} -eq 0 ]]; then
-#		echo "${sign_uid}: no @g.o UID (${key})"
+		#echo "${sign_uid}: no @g.o UID (${key})"
 		return 1
 	elif [[ ${#uids[@]} -eq 1 && ${need_full} -eq 0 ]]; then
 		# if UID is unambiguous, use e-mail
