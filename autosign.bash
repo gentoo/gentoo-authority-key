@@ -29,7 +29,8 @@ die() {
 refresh_keys() {
 	# we trust qa-scripts to refresh them for us
 	wget -q -O - https://qa-reports.gentoo.org/output/active-devs.gpg |
-		gpg -q --import || die "Failed to refresh keys"
+		gpg -q --import
+	pipestatus || die "Failed to refresh keys: $?"
 }
 
 # Get UID-fingerprint mapping from LDAP, for active devs.
@@ -106,7 +107,8 @@ get_signed_keys() {
 					printf "%s\t%s\n" "${email,,}" "${fpr}"
 				;;
 		esac
-	done < <(gpg --with-colons --list-keys)
+	done < <(gpg --with-colons --list-keys || die "gpg query for signed keys failed")
+	pipestatus || die "gpg query for signed keys failed: $?"
 }
 
 # Revoke the specified UID signature.
