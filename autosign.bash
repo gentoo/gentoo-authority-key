@@ -3,6 +3,23 @@
 # (c) 2019 Michał Górny
 # 2-clause BSD license
 
+pipestatus() {
+	# Copied from eapi9-pipestatus.eclass
+	local status=( "${PIPESTATUS[@]}" )
+	local s ret=0 verbose=""
+
+	[[ ${1} == -v ]] && { verbose=1; shift; }
+	[[ $# -ne 0 ]] && die "usage: ${FUNCNAME} [-v]"
+
+	for s in "${status[@]}"; do
+		[[ ${s} -ne 0 ]] && ret=${s}
+	done
+
+	[[ ${verbose} ]] && echo "${status[@]}"
+
+	return "${ret}"
+}
+
 die() {
 	echo "${@}" >&2
 	exit 1
@@ -50,6 +67,7 @@ get_ldap() {
 		esac
 	done < <(ldapsearch -Z -D '' -LLL "${AUTOSIGN_FILTER:-(gentooStatus=active)}" gpgfingerprint ||
 		die "LDAP query failed")
+	pipestatus || die "LDAP query failed: $?"
 }
 
 # Get UID-fingerprint list of all currently trusted keys.
