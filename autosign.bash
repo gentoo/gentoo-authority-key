@@ -67,7 +67,7 @@ get_ldap() {
 				;;
 		esac
 	done < <(ldapsearch -Z -D '' -LLL "${AUTOSIGN_FILTER:-(gentooStatus=active)}" gpgfingerprint)
-	pipestatus || die "LDAP query failed, exited w/ $?"
+	wait "$!" || die "LDAP query failed, exited w/ $?"
 }
 
 # Get UID-fingerprint list of all currently trusted keys.
@@ -107,7 +107,7 @@ get_signed_keys() {
 				;;
 		esac
 	done < <(gpg --batch --with-colons --list-keys)
-	pipestatus || die "gpg query for signed keys failed, exited w/ $?"
+	wait "$!" || die "gpg --list-keys failed, exited w/ $?"
 }
 
 # Revoke the specified UID signature.
