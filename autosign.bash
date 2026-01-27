@@ -208,9 +208,9 @@ main() {
 
 	refresh_keys
 	get_ldap | sort -u > ldap.txt
-	pipestatus || die 'failure writing ldap.txt: $?'
+	pipestatus || die "failure writing ldap.txt: $?"
 	get_signed_keys | sort -u > signed.txt
-	pipestatus || die 'failure writing signed.txt: $?'
+	pipestatus || die "failure writing signed.txt: $?"
 
 	if ! [[ -s ldap.txt ]] ; then
 		# Avoid revoking every key we trust if our LDAP query fails
