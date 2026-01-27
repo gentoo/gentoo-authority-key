@@ -66,8 +66,7 @@ get_ldap() {
 				die "Unknown LDAP data: ${l}"
 				;;
 		esac
-	done < <(ldapsearch -Z -D '' -LLL "${AUTOSIGN_FILTER:-(gentooStatus=active)}" gpgfingerprint ||
-		die "LDAP query failed")
+	done < <(ldapsearch -Z -D '' -LLL "${AUTOSIGN_FILTER:-(gentooStatus=active)}" gpgfingerprint)
 	pipestatus || die "LDAP query failed: $?"
 }
 
@@ -107,7 +106,7 @@ get_signed_keys() {
 					printf "%s\t%s\n" "${email,,}" "${fpr}"
 				;;
 		esac
-	done < <(gpg --with-colons --list-keys || die "gpg query for signed keys failed")
+	done < <(gpg --with-colons --list-keys)
 	pipestatus || die "gpg query for signed keys failed: $?"
 }
 
