@@ -262,7 +262,8 @@ main() {
 			# Prefer the same script we use for developers to avoid
 			# bad luck with missing sychronisation.
 			if [[ -x /usr/local/bin/openpgp-key-upload ]]; then
-				if gpg --export ${OPENPGP_KEY_UPLOAD_KEYS} | /usr/local/bin/openpgp-key-upload; then
+				gpg --export ${OPENPGP_KEY_UPLOAD_KEYS} | /usr/local/bin/openpgp-key-upload
+				if pipestatus; then
 					tail -n +11 to-send.txt > to-send.txt.tmp &&
 					mv to-send.txt.tmp to-send.txt || die 'failure writing to-send.txt'
 				else
