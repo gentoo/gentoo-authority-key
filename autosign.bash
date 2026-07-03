@@ -257,11 +257,24 @@ main() {
 		# send key updates to the keyserver
 		local retries=0
 		while [[ -s to-send.txt ]]; do
-			if gpg --batch --send-keys $(head -n 10 to-send.txt); then
-				tail -n +11 to-send.txt > to-send.txt.tmp &&
-				mv to-send.txt.tmp to-send.txt || die 'failure writing to-send.txt'
+			export OPENPGP_KEY_UPLOAD_KEYS=$(head -n 10 to-send.txt)
+
+			# Prefer the same script we use for developers to avoid
+			# bad luck with missing sychronisation.
+			if [[ -x /usr/local/bin/openpgp-key-upload ]]; then
+				if /usr/local/bin/openpgp-key-upload; then
+					tail -n +11 to-send.txt > to-send.txt.tmp &&
+					mv to-send.txt.tmp to-send.txt || die 'failure writing to-send.txt'
+				else
+					[[ $(( ++retries )) -ge 5 ]] && die 'send failure limit exceeded'
+				fi
 			else
-				[[ $(( ++retries )) -ge 5 ]] && die 'send failure limit exceeded'
+				if gpg --batch --send-keys ${OPENPGP_KEY_UPLOAD_KEYS}; then
+					tail -n +11 to-send.txt > to-send.txt.tmp &&
+					mv to-send.txt.tmp to-send.txt || die 'failure writing to-send.txt'
+				else
+					[[ $(( ++retries )) -ge 5 ]] && die 'send failure limit exceeded'
+				fi
 			fi
 		done
 	fi
