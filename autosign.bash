@@ -21,8 +21,15 @@ pipestatus() {
 }
 
 die() {
+	case $? in
+		0)
+			ret=1
+			;;
+		*)
+			ret=$?
+	esac
 	echo "${@}" >&2
-	exit 1
+	exit "${ret}"
 }
 
 # Import key updates.
