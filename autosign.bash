@@ -27,6 +27,10 @@ die() {
 
 # Import key updates.
 refresh_keys() {
+	# qa-reports has a keyring for service keys too but let's use
+	# the local copy so we're clear on what we're trusting.
+	gpg -q --batch --import /usr/share/openpgp-keys/gentoo-auth.asc || die "Failed to import gentoo-auth.asc, exited w/ $?"
+
 	# we trust qa-scripts to refresh them for us
 	wget -q -O - https://qa-reports.gentoo.org/output/active-devs.gpg |
 		gpg -q --batch --import
