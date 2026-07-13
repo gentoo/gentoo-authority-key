@@ -233,10 +233,15 @@ main() {
 		fi
 	fi
 
+	# sanity check in case something failed and LDAP returned
+	# suspicously short list (yes, it can do that)
+	# see 2026-01-26, 2026-07-13
+	if [[ $(comm -23 signed.txt ldap.txt | wc -l) -gt ${AUTOSIGN_MAX_REVOKE:-10} ]]; then
+		die 'trying to revoke 10+ keys, looks sus'
+	fi
+
 	local k uid
 	# revoke signatures on old keys
-	# TODO: add a configurable sanity check threshold for max
-	# revocations in a single run
 	while read uid k; do
 		if revoke_sig "${k}" "${uid}"; then
 			echo "${k}" >> to-send.txt || die 'failure writing to-send.txt'
