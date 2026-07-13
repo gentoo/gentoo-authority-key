@@ -219,6 +219,14 @@ main() {
 	# avoid running with old agent
 	gpgconf --kill all
 
+	# Keep the last run around for easier debugging, but always clean
+	# up existing ones first so it's clear which are fresh from a given
+	# run.
+	local filename
+	for filename in ldap.txt signed.txt to-send.txt ; do
+		mv "${filename}" "${filename}.old"
+	done
+
 	refresh_keys
 	get_ldap | sort -u > ldap.txt
 	pipestatus || die "failure writing ldap.txt, exited w/ $?"
