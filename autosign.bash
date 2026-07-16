@@ -224,7 +224,7 @@ main() {
 	# run.
 	local filename
 	for filename in ldap.txt signed.txt to-send.txt ; do
-		mv "${filename}" "${filename}.old"
+		mv "${filename}" "${filename}.old" &> /dev/null
 	done
 
 	refresh_keys
